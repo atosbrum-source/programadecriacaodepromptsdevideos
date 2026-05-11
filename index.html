@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App do Velho Brum</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/roboto/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/roboto/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/roboto/900.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a28;--surface3:#222233;
+--accent:#f5a623;--accent2:#ff6b35;--accent3:#e84393;
+--text:#e8e8f0;--text2:#a0a0b8;--text3:#6a6a80;
+--green:#00b894;--blue:#0984e3;--red:#d63031;
+--radius:12px;--radius2:8px;
+}
+html{scroll-behavior:smooth}
+body{
+font-family:'Roboto',sans-serif;background:var(--bg);color:var(--text);
+min-height:100vh;overflow-x:hidden;
+}
+/* SPLASH SCREEN */
+#splash{
+position:fixed;inset:0;z-index:9999;
+background:linear-gradient(135deg,#0a0a12 0%,#1a0a20 50%,#0a0a12 100%);
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+transition:opacity 0.8s ease,transform 0.8s ease;
+}
+#splash.hide{opacity:0;transform:scale(1.05);pointer-events:none}
+#splash img{
+width:320px;max-width:85vw;height:auto;border-radius:20px;
+box-shadow:0 0 60px rgba(245,166,35,0.3),0 0 120px rgba(245,166,35,0.1);
+animation:splashPulse 2s ease-in-out infinite;
+}
+#splash .splash-sub{
+margin-top:20px;color:var(--accent);font-size:14px;
+letter-spacing:3px;text-transform:uppercase;opacity:0.7;
+}
+@keyframes splashPulse{
+0%,100%{transform:scale(1);filter:brightness(1)}
+50%{transform:scale(1.02);filter:brightness(1.1)}
+}
+/* LOADING BAR */
+.splash-loader{
+width:200px;height:4px;background:var(--surface3);border-radius:2px;
+margin-top:30px;overflow:hidden;
+}
+.splash-loader-bar{
+height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+border-radius:2px;animation:loadBar 2.5s ease-in-out forwards;
+}
+@keyframes loadBar{0%{width:0}100%{width:100%}}
+/* MAIN APP */
+#app{
+display:none;max-width:900px;margin:0 auto;padding:20px 16px 100px;
+opacity:0;transition:opacity 0.6s ease;
+}
+#app.show{display:block;opacity:1}
+/* HEADER */
+.app-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:16px 0;margin-bottom:24px;
+border-bottom:1px solid var(--surface3);
+}
+.app-logo{display:flex;align-items:center;gap:12px}
+.app-logo img{width:44px;height:44px;border-radius:10px}
+.app-logo h1{
+font-size:18px;font-weight:900;
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+background-clip:text;
+}
+.app-logo small{display:block;font-size:11px;color:var(--text3);font-weight:400;-webkit-text-fill-color:var(--text3)}
+.header-actions{display:flex;align-items:center;gap:10px}
+/* LANGUAGE SELECTOR TOP */
+.lang-selector-top{
+display:flex;align-items:center;gap:6px;
+background:var(--surface2);border:1px solid var(--surface3);
+border-radius:20px;padding:4px;
+}
+.lang-btn-top{
+display:flex;align-items:center;gap:5px;
+padding:6px 12px;border-radius:16px;border:none;
+background:transparent;color:var(--text2);cursor:pointer;
+font-size:12px;font-weight:700;transition:all 0.3s;
+}
+.lang-btn-top.active{
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+color:#fff;
+}
+.lang-btn-top img{width:18px;height:18px;border-radius:50%}
+/* HELP BUTTON */
+.help-btn{
+width:36px;height:36px;border-radius:50%;border:2px solid var(--surface3);
+background:var(--surface2);color:var(--accent);font-size:18px;
+font-weight:900;cursor:pointer;transition:all 0.3s;
+display:flex;align-items:center;justify-content:center;
+}
+.help-btn:hover{border-color:var(--accent);transform:rotate(15deg);background:var(--surface3)}
+/* SECTIONS */
+.section{
+background:var(--surface);border:1px solid var(--surface3);
+border-radius:var(--radius);padding:20px;margin-bottom:16px;
+transition:border-color 0.3s;
+}
+.section:hover{border-color:rgba(245,166,35,0.3)}
+.section-title{
+font-size:14px;font-weight:900;text-transform:uppercase;
+letter-spacing:2px;color:var(--accent);margin-bottom:16px;
+display:flex;align-items:center;gap:8px;
+}
+.section-title .icon{font-size:18px}
+/* FORM ELEMENTS */
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.form-label{
+display:block;font-size:12px;font-weight:700;
+color:var(--text2);margin-bottom:6px;text-transform:uppercase;
+letter-spacing:1px;
+}
+.form-input,.form-textarea,.form-select{
+width:100%;padding:12px 16px;background:var(--surface2);
+border:1px solid var(--surface3);border-radius:var(--radius2);
+color:var(--text);font-size:14px;font-family:'Roboto',sans-serif;
+transition:border-color 0.3s;outline:none;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,0.15);
+}
+.form-textarea{resize:vertical;min-height:80px}
+.form-select{cursor:pointer;appearance:none;
+background-image:url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+background-repeat:no-repeat;background-position:right 12px center;
+padding-right:36px;
+}
+.form-select option{background:var(--surface2);color:var(--text)}
+/* OPTION GRID */
+.option-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.option-card{
+padding:12px;background:var(--surface2);border:2px solid var(--surface3);
+border-radius:var(--radius2);cursor:pointer;text-align:center;
+transition:all 0.3s;font-size:12px;font-weight:700;color:var(--text2);
+}
+.option-card:hover{border-color:var(--accent);color:var(--text)}
+.option-card.selected{
+border-color:var(--accent);background:rgba(245,166,35,0.1);
+color:var(--accent);box-shadow:0 0 12px rgba(245,166,35,0.2);
+}
+.option-card .opt-icon{font-size:22px;display:block;margin-bottom:6px}
+/* SLIDER */
+.slider-group{display:flex;align-items:center;gap:12px}
+.slider-group input[type=range]{
+flex:1;-webkit-appearance:none;height:6px;
+background:var(--surface3);border-radius:3px;outline:none;
+}
+.slider-group input[type=range]::-webkit-slider-thumb{
+-webkit-appearance:none;width:20px;height:20px;
+border-radius:50%;background:var(--accent);cursor:pointer;
+box-shadow:0 0 8px rgba(245,166,35,0.4);
+}
+.slider-value{
+min-width:40px;text-align:center;font-size:14px;
+font-weight:900;color:var(--accent);
+}
+/* CHECKBOX */
+.checkbox-group{display:flex;flex-wrap:wrap;gap:8px}
+.checkbox-item{
+padding:8px 14px;background:var(--surface2);border:1px solid var(--surface3);
+border-radius:20px;cursor:pointer;font-size:12px;font-weight:700;
+color:var(--text2);transition:all 0.3s;display:flex;align-items:center;gap:6px;
+}
+.checkbox-item:hover{border-color:var(--accent);color:var(--text)}
+.checkbox-item.checked{
+border-color:var(--green);background:rgba(0,184,148,0.1);
+color:var(--green);
+}
+.checkbox-item .check-icon{
+width:14px;height:14px;border-radius:50%;border:2px solid var(--text3);
+display:flex;align-items:center;justify-content:center;font-size:8px;
+transition:all 0.3s;
+}
+.checkbox-item.checked .check-icon{
+border-color:var(--green);background:var(--green);color:#fff;
+}
+/* GENERATE BUTTON */
+.generate-section{
+margin-top:24px;padding:20px;
+background:linear-gradient(135deg,rgba(245,166,35,0.08),rgba(255,107,53,0.08));
+border:1px solid rgba(245,166,35,0.2);border-radius:var(--radius);
+}
+.generate-btn{
+width:100%;padding:16px;border:none;border-radius:var(--radius);
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+color:#000;font-size:16px;font-weight:900;cursor:pointer;
+text-transform:uppercase;letter-spacing:2px;
+transition:all 0.3s;position:relative;overflow:hidden;
+}
+.generate-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 30px rgba(245,166,35,0.4);
+}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn .btn-shine{
+position:absolute;top:0;left:-100%;width:100%;height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+transition:left 0.6s;
+}
+.generate-btn:hover .btn-shine{left:100%}
+/* PROMPT OUTPUT */
+.prompt-output{
+margin-top:20px;display:none;
+background:var(--surface);border:1px solid var(--surface3);
+border-radius:var(--radius);overflow:hidden;
+}
+.prompt-output.show{display:block;animation:fadeUp 0.5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.prompt-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:16px 20px;background:var(--surface2);
+border-bottom:1px solid var(--surface3);
+}
+.prompt-header h3{font-size:14px;color:var(--accent);font-weight:900}
+.prompt-actions{display:flex;gap:8px}
+.prompt-action-btn{
+padding:6px 14px;border-radius:6px;border:1px solid var(--surface3);
+background:var(--surface);color:var(--text2);font-size:11px;
+font-weight:700;cursor:pointer;transition:all 0.3s;
+display:flex;align-items:center;gap:4px;
+}
+.prompt-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.prompt-action-btn.copied{border-color:var(--green);color:var(--green)}
+.prompt-body{padding:20px}
+.prompt-text{
+font-size:14px;line-height:1.8;color:var(--text);
+white-space:pre-wrap;word-break:break-word;
+font-family:'Roboto',monospace;
+}
+.prompt-meta{
+padding:12px 20px;background:var(--surface2);
+border-top:1px solid var(--surface3);
+display:flex;align-items:center;gap:8px;
+font-size:11px;color:var(--text3);
+}
+.prompt-lang-badge{
+padding:3px 10px;border-radius:10px;font-size:10px;font-weight:900;
+}
+.prompt-lang-badge.pt{background:rgba(0,184,148,0.15);color:var(--green)}
+.prompt-lang-badge.en{background:rgba(9,132,227,0.15);color:var(--blue)}
+/* BOTTOM BAR */
+.bottom-bar{
+position:fixed;bottom:0;left:0;right:0;
+background:var(--surface);border-top:1px solid var(--surface3);
+padding:10px 16px;z-index:100;
+display:flex;align-items:center;justify-content:space-between;
+}
+.bottom-bar-label{
+font-size:11px;font-weight:700;color:var(--text3);
+text-transform:uppercase;letter-spacing:1px;
+}
+.prompt-lang-toggle{
+display:flex;align-items:center;gap:8px;
+}
+.prompt-lang-btn{
+display:flex;align-items:center;gap:6px;
+padding:8px 16px;border-radius:20px;border:2px solid var(--surface3);
+background:var(--surface2);color:var(--text2);cursor:pointer;
+font-size:12px;font-weight:700;transition:all 0.3s;
+}
+.prompt-lang-btn.active{
+border-color:var(--accent);color:var(--accent);
+background:rgba(245,166,35,0.1);
+}
+.prompt-lang-btn img{width:22px;height:22px;border-radius:50%}
+/* HELP MODAL */
+.modal-overlay{
+position:fixed;inset:0;z-index:10000;
+background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+display:none;align-items:center;justify-content:center;
+padding:20px;
+}
+.modal-overlay.show{display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+background:var(--surface);border:1px solid var(--surface3);
+border-radius:16px;max-width:500px;width:100%;
+max-height:80vh;overflow-y:auto;
+animation:modalUp 0.4s ease;
+}
+@keyframes modalUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:20px 24px;border-bottom:1px solid var(--surface3);
+}
+.modal-header h2{font-size:18px;font-weight:900;color:var(--accent)}
+.modal-close{
+width:32px;height:32px;border-radius:50%;border:none;
+background:var(--surface2);color:var(--text2);font-size:18px;
+cursor:pointer;transition:all 0.3s;
+display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{background:var(--red);color:#fff}
+.modal-body{padding:24px}
+.help-step{
+display:flex;gap:14px;margin-bottom:20px;
+padding:14px;background:var(--surface2);border-radius:var(--radius2);
+}
+.help-step:last-child{margin-bottom:0}
+.help-num{
+width:32px;height:32px;border-radius:50%;
+background:linear-gradient(135deg,var(--accent),var(--accent2));
+color:#000;font-size:14px;font-weight:900;
+display:flex;align-items:center;justify-content:center;
+flex-shrink:0;
+}
+.help-content h4{font-size:13px;font-weight:900;color:var(--text);margin-bottom:4px}
+.help-content p{font-size:12px;color:var(--text2);line-height:1.6}
+/* RESPONSIVE */
+@media(max-width:600px){
+.option-grid{grid-template-columns:repeat(2,1fr)}
+.app-logo h1{font-size:14px}
+.bottom-bar{flex-direction:column;gap:8px;padding:10px}
+}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+/* ANIMATIONS */
+.fade-in{animation:fadeIn 0.5s ease}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+<img src="imagem1.png" alt="O Velho Brum">
+<div class="splash-sub">App do Velho Brum</div>
+<div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+<!-- HEADER -->
+<header class="app-header">
+<div class="app-logo">
+<img src="imagem1.png" alt="Logo">
+<div>
+<h1>Geração de Prompts de Vídeo</h1>
+<small>www.youtube.com/@o_velho_brum</small>
+</div>
+</div>
+<div class="header-actions">
+<div class="lang-selector-top">
+<button class="lang-btn-top active" onclick="setAppLang('pt')" id="langBtnPt">
+<img src="imagem2.png" alt="BR"> PT
+</button>
+<button class="lang-btn-top" onclick="setAppLang('en')" id="langBtnEn">
+<img src="imagem3.png" alt="US"> EN
+</button>
+</div>
+<button class="help-btn" onclick="toggleHelp()">?</button>
+</div>
+</header>
+
+<!-- 1. TEMA PRINCIPAL -->
+<div class="section">
+<div class="section-title"><span class="icon">🎬</span> <span data-i18n="theme">TEMA PRINCIPAL</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="themeLabel">Descreva o tema central do seu vídeo</label>
+<textarea class="form-textarea" id="themeInput" data-i18n-placeholder="themePlaceholder" placeholder="Ex: Uma mulher caminhando por uma floresta encantada ao amanhecer..."></textarea>
+</div>
+</div>
+
+<!-- 2. ESTILO VISUAL -->
+<div class="section">
+<div class="section-title"><span class="icon">🎨</span> <span data-i18n="style">ESTILO VISUAL</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="styleLabel">Selecione o estilo visual</label>
+<div class="option-grid" id="styleGrid">
+<div class="option-card" onclick="selectOption('style',this,'Cinematográfico')" data-value="Cinematográfico"><span class="opt-icon">🎥</span><span data-i18n="optCinema">Cinematográfico</span></div>
+<div class="option-card" onclick="selectOption('style',this,'Anime')" data-value="Anime"><span class="opt-icon">🌸</span>Anime</div>
+<div class="option-card" onclick="selectOption('style',this,'Realista')" data-value="Realista"><span class="opt-icon">📷</span><span data-i18n="optReal">Realista</span></div>
+<div class="option-card" onclick="selectOption('style',this,'3D Render')" data-value="3D Render"><span class="opt-icon"></span><span data-i18n="opt3d">3D Render</span></div>
+<div class="option-card" onclick="selectOption('style',this,'Pixel Art')" data-value="Pixel Art"><span class="opt-icon">👾</span>Pixel Art</div>
+<div class="option-card" onclick="selectOption('style',this,'Aquarela')" data-value="Aquarela"><span class="opt-icon">🖌️</span><span data-i18n="optWater">Aquarela</span></div>
+<div class="option-card" onclick="selectOption('style',this,'Noir')" data-value="Noir"><span class="opt-icon">🖤</span>Noir</div>
+<div class="option-card" onclick="selectOption('style',this,'Fantasia')" data-value="Fantasia"><span class="opt-icon">🧙</span><span data-i18n="optFantasy">Fantasia</span></div>
+<div class="option-card" onclick="selectOption('style',this,'Sci-Fi')" data-value="Sci-Fi"><span class="opt-icon">🚀</span>Sci-Fi</div>
+<div class="option-card" onclick="selectOption('style',this,'Documentário')" data-value="Documentário"><span class="opt-icon">📹</span><span data-i18n="optDoc">Documentário</span></div>
+<div class="option-card" onclick="selectOption('style',this,'Stop Motion')" data-value="Stop Motion"><span class="opt-icon">🎞️</span>Stop Motion</div>
+<div class="option-card" onclick="selectOption('style',this,'Vaporwave')" data-value="Vaporwave"><span class="opt-icon">🌊</span>Vaporwave</div>
+</div>
+</div>
+</div>
+
+<!-- 3. CÂMERA -->
+<div class="section">
+<div class="section-title"><span class="icon"></span> <span data-i18n="camera">CÂMERA</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="angleLabel">Ângulo de Câmera</label>
+<div class="option-grid" id="angleGrid">
+<div class="option-card" onclick="selectOption('angle',this,'Close-up')" data-value="Close-up"><span class="opt-icon">🔍</span>Close-up</div>
+<div class="option-card" onclick="selectOption('angle',this,'Medium Shot')" data-value="Medium Shot"><span class="opt-icon">👤</span>Medium Shot</div>
+<div class="option-card" onclick="selectOption('angle',this,'Wide Shot')" data-value="Wide Shot"><span class="opt-icon">🏔️</span>Wide Shot</div>
+<div class="option-card" onclick="selectOption('angle',this,'Extreme Close-up')" data-value="Extreme Close-up"><span class="opt-icon">👁️</span>Extreme CU</div>
+<div class="option-card" onclick="selectOption('angle',this,'Bird Eye View')" data-value="Bird Eye View"><span class="opt-icon">🦅</span>Bird Eye</div>
+<div class="option-card" onclick="selectOption('angle',this,'Low Angle')" data-value="Low Angle"><span class="opt-icon">⬇️</span><span data-i18n="optLow">Ângulo Baixo</span></div>
+<div class="option-card" onclick="selectOption('angle',this,'Dutch Angle')" data-value="Dutch Angle"><span class="opt-icon"></span>Dutch Angle</div>
+<div class="option-card" onclick="selectOption('angle',this,'Over Shoulder')" data-value="Over Shoulder"><span class="opt-icon">🫡</span>Over Shoulder</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="movementLabel">Movimento de Câmera</label>
+<div class="option-grid" id="cameraMoveGrid">
+<div class="option-card" onclick="selectOption('camMove',this,'Static')" data-value="Static"><span class="opt-icon">⏸️</span><span data-i18n="optStatic">Estático</span></div>
+<div class="option-card" onclick="selectOption('camMove',this,'Slow Pan')" data-value="Slow Pan"><span class="opt-icon">🔄</span>Slow Pan</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Dolly In')" data-value="Dolly In"><span class="opt-icon">➡️</span>Dolly In</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Dolly Out')" data-value="Dolly Out"><span class="opt-icon">⬅️</span>Dolly Out</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Tracking Shot')" data-value="Tracking Shot"><span class="opt-icon">🏃</span>Tracking</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Crane Shot')" data-value="Crane Shot"><span class="opt-icon">️</span>Crane</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Handheld')" data-value="Handheld"><span class="opt-icon"></span>Handheld</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Orbit')" data-value="Orbit"><span class="opt-icon">🌀</span>Orbit</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Zoom In')" data-value="Zoom In"><span class="opt-icon">🔎</span>Zoom In</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Zoom Out')" data-value="Zoom Out"><span class="opt-icon">🔭</span>Zoom Out</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Tilt Up')" data-value="Tilt Up"><span class="opt-icon">️</span>Tilt Up</div>
+<div class="option-card" onclick="selectOption('camMove',this,'Tilt Down')" data-value="Tilt Down"><span class="opt-icon">⬇️</span>Tilt Down</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="lensLabel">Tipo de Lente</label>
+<select class="form-select" id="lensSelect">
+<option value="" data-i18n="optLensNone">Nenhuma (Automático)</option>
+<option value="35mm lens">35mm - Grande Angular</option>
+<option value="50mm lens">50mm - Normal</option>
+<option value="85mm lens">85mm - Retrato</option>
+<option value="135mm lens">135mm - Teleobjetiva</option>
+<option value="200mm lens">200mm - Super Tele</option>
+<option value="Macro lens">Macro Lens</option>
+<option value="Fisheye lens">Fisheye Lens</option>
+<option value="Anamorphic lens">Anamorphic Lens</option>
+<option value="Tilt-shift lens">Tilt-shift Lens</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="depthLabel">Profundidade de Campo</label>
+<select class="form-select" id="depthSelect">
+<option value="" data-i18n="optDepthNone">Nenhuma (Automático)</option>
+<option value="shallow depth of field, bokeh background">Rasa (Bokeh)</option>
+<option value="deep depth of field, everything in focus">Profunda (Tudo em Foco)</option>
+<option value="tilt-shift effect, miniature look">Tilt-shift (Miniatura)</option>
+</select>
+</div>
+</div>
+
+<!-- 4. ILUMINAÇÃO -->
+<div class="section">
+<div class="section-title"><span class="icon">💡</span> <span data-i18n="lighting">ILUMINAÇÃO</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="lightLabel">Tipo de Iluminação</label>
+<div class="option-grid" id="lightGrid">
+<div class="option-card" onclick="selectOption('light',this,'Golden Hour')" data-value="Golden Hour"><span class="opt-icon">🌅</span>Golden Hour</div>
+<div class="option-card" onclick="selectOption('light',this,'Blue Hour')" data-value="Blue Hour"><span class="opt-icon">🌃</span>Blue Hour</div>
+<div class="option-card" onclick="selectOption('light',this,'Dramatic Lighting')" data-value="Dramatic Lighting"><span class="opt-icon">🎭</span>Dramática</div>
+<div class="option-card" onclick="selectOption('light',this,'Natural Light')" data-value="Natural Light"><span class="opt-icon">☀️</span>Natural</div>
+<div class="option-card" onclick="selectOption('light',this,'Studio Lighting')" data-value="Studio Lighting"><span class="opt-icon"></span>Estúdio</div>
+<div class="option-card" onclick="selectOption('light',this,'Neon Lights')" data-value="Neon Lights"><span class="opt-icon"></span>Neon</div>
+<div class="option-card" onclick="selectOption('light',this,'Rembrandt Lighting')" data-value="Rembrandt Lighting"><span class="opt-icon">️</span>Rembrandt</div>
+<div class="option-card" onclick="selectOption('light',this,'Backlit')" data-value="Backlit"><span class="opt-icon"></span>Contra-luz</div>
+<div class="option-card" onclick="selectOption('light',this,'Moonlight')" data-value="Moonlight"><span class="opt-icon"></span>Luz da Lua</div>
+<div class="option-card" onclick="selectOption('light',this,'Candlelight')" data-value="Candlelight"><span class="opt-icon">🕯️</span>Vela</div>
+<div class="option-card" onclick="selectOption('light',this,'Volumetric Lighting')" data-value="Volumetric Lighting"><span class="opt-icon">✨</span>Volumétrica</div>
+<div class="option-card" onclick="selectOption('light',this,'Rim Lighting')" data-value="Rim Lighting"><span class="opt-icon"></span>Rim Light</div>
+</div>
+</div>
+</div>
+
+<!-- 5. ATMOSFERA / MOOD -->
+<div class="section">
+<div class="section-title"><span class="icon">🌤️</span> <span data-i18n="atmosphere">ATMOSFERA E MOOD</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="moodLabel">Selecione o clima atmosférico</label>
+<div class="checkbox-group" id="moodGroup">
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodFog">Neblina</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodRain">Chuva</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodSnow">Neve</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodWind">Vento</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodDust">Poeira</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodSmoke">Fumaça</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodSparkles">Brilhos</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodParticles">Partículas</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodMist">Névoa</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="moodLeaves">Folhas</span></div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="emotionLabel">Emoção / Sentimento</label>
+<div class="option-grid" id="emotionGrid">
+<div class="option-card" onclick="selectOption('emotion',this,'Melancholic')" data-value="Melancholic"><span class="opt-icon">😢</span>Melancólico</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Joyful')" data-value="Joyful"><span class="opt-icon">😊</span>Alegre</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Mysterious')" data-value="Mysterious"><span class="opt-icon">🔮</span>Misterioso</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Epic')" data-value="Epic"><span class="opt-icon">⚔️</span>Épico</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Romantic')" data-value="Romantic"><span class="opt-icon"></span>Romântico</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Dark')" data-value="Dark"><span class="opt-icon">🖤</span>Sombrio</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Peaceful')" data-value="Peaceful"><span class="opt-icon">☮️</span>Pacífico</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Tense')" data-value="Tense"><span class="opt-icon">😰</span>Tenso</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Nostalgic')" data-value="Nostalgic"><span class="opt-icon"></span>Nostálgico</div>
+<div class="option-card" onclick="selectOption('emotion',this,'Whimsical')" data-value="Whimsical"><span class="opt-icon"></span>Fantástico</div>
+</div>
+</div>
+</div>
+
+<!-- 6. CENÁRIO -->
+<div class="section">
+<div class="section-title"><span class="icon">🏞️</span> <span data-i18n="setting">CENÁRIO</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="locationLabel">Tipo de Localização</label>
+<div class="option-grid" id="locationGrid">
+<div class="option-card" onclick="selectOption('location',this,'Urban City')" data-value="Urban City"><span class="opt-icon">🏙️</span>Cidade</div>
+<div class="option-card" onclick="selectOption('location',this,'Forest')" data-value="Forest"><span class="opt-icon">🌲</span>Floresta</div>
+<div class="option-card" onclick="selectOption('location',this,'Ocean/Beach')" data-value="Ocean/Beach"><span class="opt-icon">🏖️</span>Praia/Oceano</div>
+<div class="option-card" onclick="selectOption('location',this,'Mountain')" data-value="Mountain"><span class="opt-icon">⛰️</span>Montanha</div>
+<div class="option-card" onclick="selectOption('location',this,'Desert')" data-value="Desert"><span class="opt-icon">🏜️</span>Deserto</div>
+<div class="option-card" onclick="selectOption('location',this,'Indoor/Room')" data-value="Indoor/Room"><span class="opt-icon">🏠</span>Interior</div>
+<div class="option-card" onclick="selectOption('location',this,'Space')" data-value="Space"><span class="opt-icon">🌌</span>Espaço</div>
+<div class="option-card" onclick="selectOption('location',this,'Underwater')" data-value="Underwater"><span class="opt-icon"></span>Subaquático</div>
+<div class="option-card" onclick="selectOption('location',this,'Historical')" data-value="Historical Setting"><span class="opt-icon">🏛️</span>Histórico</div>
+<div class="option-card" onclick="selectOption('location',this,'Fantasy World')" data-value="Fantasy World"><span class="opt-icon">🧝</span>Mundo Fantasia</div>
+<div class="option-card" onclick="selectOption('location',this,'Cyberpunk City')" data-value="Cyberpunk City"><span class="opt-icon"></span>Cyberpunk</div>
+<div class="option-card" onclick="selectOption('location',this,'Post-Apocalyptic')" data-value="Post-Apocalyptic"><span class="opt-icon">☢️</span>Pós-Apocalíptico</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="timeLabel">Hora do Dia</label>
+<select class="form-select" id="timeSelect">
+<option value="" data-i18n="optTimeNone">Nenhuma (Automático)</option>
+<option value="dawn, early morning light">Amanhecer</option>
+<option value="morning, soft sunlight">Manhã</option>
+<option value="midday, bright harsh sunlight">Meio-dia</option>
+<option value="afternoon, warm golden light">Tarde</option>
+<option value="sunset, golden hour, warm orange tones">Pôr do Sol</option>
+<option value="twilight, blue hour, purple sky">Crepúsculo</option>
+<option value="night, dark, moonlight">Noite</option>
+<option value="midnight, deep darkness, stars">Meia-noite</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="weatherLabel">Clima / Tempo</label>
+<select class="form-select" id="weatherSelect">
+<option value="" data-i18n="optWeatherNone">Nenhum (Automático)</option>
+<option value="clear sky, sunny">Céu Limpo / Ensolarado</option>
+<option value="overcast, cloudy sky">Nublado</option>
+<option value="light rain, drizzle">Chuva Leve</option>
+<option value="heavy rain, storm">Chuva Forte / Tempestade</option>
+<option value="thunderstorm, lightning">Trovoadas / Raios</option>
+<option value="snowfall, winter atmosphere">Neve</option>
+<option value="foggy, misty atmosphere">Neblina</option>
+<option value="windy, dust swirling">Ventoso</option>
+<option value="heat haze, shimmering air">Calor / Ondulação</option>
+<option value="aurora borealis, northern lights">Aurora Boreal</option>
+</select>
+</div>
+</div>
+
+<!-- 7. PERSONAGENS / SUJEITOS -->
+<div class="section">
+<div class="section-title"><span class="icon">👥</span> <span data-i18n="characters">PERSONAGENS / SUJEITOS</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="subjectLabel">Descrição do Sujeito Principal</label>
+<textarea class="form-textarea" id="subjectInput" data-i18n-placeholder="subjectPlaceholder" placeholder="Ex: Uma jovem mulher com cabelos ruivos longos, vestindo um casaco vermelho, com expressão determinada..."></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="actionLabel">Ação / Movimento do Sujeito</label>
+<textarea class="form-textarea" id="actionInput" data-i18n-placeholder="actionPlaceholder" placeholder="Ex: Caminhando lentamente, virando o rosto, olhando para o horizonte..."></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="detailsLabel">Detalhes Adicionais do Sujeito</label>
+<div class="checkbox-group" id="subjectDetails">
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailHair">Detalhes do Cabelo</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailFace">Expressão Facial</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailEyes">Olhos Detalhados</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailClothes">Roupas Detalhadas</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailProps">Objetos/Props</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailAnimals">Animais</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailCrowd">Multidão</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="detailSilhouette">Silhueta</span></div>
+</div>
+</div>
+</div>
+
+<!-- 8. COMPOSIÇÃO E COR -->
+<div class="section">
+<div class="section-title"><span class="icon">🎭</span> <span data-i18n="composition">COMPOSIÇÃO E COR</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="colorPaletteLabel">Paleta de Cores</label>
+<div class="option-grid" id="colorGrid">
+<div class="option-card" onclick="selectOption('color',this,'Warm tones, orange and amber')" data-value="Warm tones, orange and amber"><span class="opt-icon">🟠</span><span data-i18n="optWarm">Quente</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Cool tones, blue and cyan')" data-value="Cool tones, blue and cyan"><span class="opt-icon">🔵</span><span data-i18n="optCool">Frio</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Monochrome, black and white')" data-value="Monochrome, black and white"><span class="opt-icon">⚫</span><span data-i18n="optMono">Mono</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Vibrant, saturated colors')" data-value="Vibrant, saturated colors"><span class="opt-icon">🌈</span><span data-i18n="optVibrant">Vibrante</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Pastel, soft muted colors')" data-value="Pastel, soft muted colors"><span class="opt-icon">🩷</span><span data-i18n="optPastel">Pastel</span></div>
+<div class="option-card" onclick="selectOption('color',this,'High contrast, bold colors')" data-value="High contrast, bold colors"><span class="opt-icon">🔴</span><span data-i18n="optContrast">Alto Contraste</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Desaturated, muted tones')" data-value="Desaturated, muted tones"><span class="opt-icon">🩶</span><span data-i18n="optMuted">Dessaturado</span></div>
+<div class="option-card" onclick="selectOption('color',this,'Teal and orange')" data-value="Teal and orange"><span class="opt-icon">🟢</span>Teal & Orange</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="aspectLabel">Proporção (Aspect Ratio)</label>
+<select class="form-select" id="aspectSelect">
+<option value="16:9">16:9 (Widescreen)</option>
+<option value="9:16">9:16 (Vertical/Reels)</option>
+<option value="1:1">1:1 (Quadrado)</option>
+<option value="21:9">21:9 (Cinemascope)</option>
+<option value="4:3">4:3 (Clássico)</option>
+<option value="2.35:1">2.35:1 (Anamórfico)</option>
+</select>
+</div>
+</div>
+
+<!-- 9. DURAÇÃO E FPS -->
+<div class="section">
+<div class="section-title"><span class="icon">⏱️</span> <span data-i18n="duration">DURAÇÃO E FRAME RATE</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="durLabel">Duração (segundos)</label>
+<div class="slider-group">
+<input type="range" min="2" max="60" value="5" id="durationSlider" oninput="updateSlider('duration')">
+<span class="slider-value" id="durationValue">5s</span>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">Frame Rate (FPS)</label>
+<select class="form-select" id="fpsSelect">
+<option value="24fps">24 FPS (Cinematográfico)</option>
+<option value="30fps">30 FPS (Padrão)</option>
+<option value="60fps">60 FPS (Fluido)</option>
+<option value="120fps">120 FPS (Slow Motion)</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="speedLabel">Velocidade</label>
+<select class="form-select" id="speedSelect">
+<option value="normal speed" data-i18n="optNormal">Normal</option>
+<option value="slow motion, 0.5x speed" data-i18n="optSlow">Slow Motion</option>
+<option value="super slow motion, 0.25x speed" data-i18n="optSuperSlow">Super Slow Motion</option>
+<option value="timelapse, accelerated speed" data-i18n="optTimeLapse">Timelapse</option>
+<option value="hyperlapse, fast motion" data-i18n="optHyper">Hyperlapse</option>
+</select>
+</div>
+</div>
+
+<!-- 10. QUALIDADE E DETALHES TÉCNICOS -->
+<div class="section">
+<div class="section-title"><span class="icon">⚙️</span> <span data-i18n="quality">QUALIDADE E DETALHES TÉCNICOS</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="qualityLabel">Nível de Qualidade</label>
+<div class="option-grid" id="qualityGrid">
+<div class="option-card" onclick="selectOption('quality',this,'4K, UHD')" data-value="4K, UHD"><span class="opt-icon">📺</span>4K UHD</div>
+<div class="option-card" onclick="selectOption('quality',this,'8K, ultra high resolution')" data-value="8K, ultra high resolution"><span class="opt-icon">📺</span>8K</div>
+<div class="option-card" onclick="selectOption('quality',this,'HDR, high dynamic range')" data-value="HDR, high dynamic range"><span class="opt-icon"></span>HDR</div>
+<div class="option-card" onclick="selectOption('quality',this,'highly detailed, intricate details')" data-value="highly detailed, intricate details"><span class="opt-icon">🔎</span><span data-i18n="optDetailed">Ultra Detalhado</span></div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="engineLabel">Motor de Renderização</label>
+<select class="form-select" id="engineSelect">
+<option value="" data-i18n="optEngineNone">Nenhum (Automático)</option>
+<option value="Unreal Engine 5 style">Unreal Engine 5</option>
+<option value="Octane Render style">Octane Render</option>
+<option value="V-Ray style">V-Ray</option>
+<option value="Redshift Render style">Redshift</option>
+<option value="Blender Cycles style">Blender Cycles</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label" data-i18n="negativeLabel">Prompt Negativo (o que evitar)</label>
+<textarea class="form-textarea" id="negativeInput" data-i18n-placeholder="negativePlaceholder" placeholder="Ex: blur, low quality, distorted, ugly, bad anatomy, watermark, text..."></textarea>
+</div>
+</div>
+
+<!-- 11. EFEITOS ESPECIAIS -->
+<div class="section">
+<div class="section-title"><span class="icon">✨</span> <span data-i18n="effects">EFEITOS ESPECIAIS</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="effectsLabel">Selecione os efeitos desejados</label>
+<div class="checkbox-group" id="effectsGroup">
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effLens">Lens Flare</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effGrain">Film Grain</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effVignette">Vinheta</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effChromatic">Aberração Cromática</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effGlow">Brilho/Glow</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effBloom">Bloom</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effMotionBlur">Motion Blur</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effDepthBlur">Desfoque de Profundidade</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effGlitch">Glitch</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effRetro">Retro/Vintage</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effHDR">HDR</span></div>
+<div class="checkbox-item" onclick="toggleCheck(this)"><span class="check-icon">✓</span><span data-i18n="effLightRays">Raios de Luz</span></div>
+</div>
+</div>
+</div>
+
+<!-- 12. REFERÊNCIAS ARTÍSTICAS -->
+<div class="section">
+<div class="section-title"><span class="icon">🎬</span> <span data-i18n="references">REFERÊNCIAS ARTÍSTICAS</span></div>
+<div class="form-group">
+<label class="form-label" data-i18n="directorLabel">Estilo de Diretor / Referência Visual</label>
+<div class="option-grid" id="directorGrid">
+<div class="option-card" onclick="selectOption('director',this,'Wes Anderson style, symmetrical, pastel')" data-value="Wes Anderson style"><span class="opt-icon">🎨</span>Wes Anderson</div>
+<div class="option-card" onclick="selectOption('director',this,'Christopher Nolan style, epic, IMAX')" data-value="Christopher Nolan style"><span class="opt-icon">🎬</span>C. Nolan</div>
+<div class="option-card" onclick="selectOption('director',this,'Studio Ghibli style, hand-drawn, whimsical')" data-value="Studio Ghibli style"><span class="opt-icon">🌿</span>Studio Ghibli</div>
+<div class="option-card" onclick="selectOption('director',this,'Ridley Scott style, atmospheric, detailed')" data-value="Ridley Scott style"><span class="opt-icon">️</span>R. Scott</div>
+<div class="option-card" onclick="selectOption('director',this,'Denis Villeneuve style, moody, vast')" data-value="Denis Villeneuve style"><span class="opt-icon">🌀</span>D. Villeneuve</div>
+<div class="option-card" onclick="selectOption('director',this,'Tim Burton style, gothic, quirky')" data-value="Tim Burton style"><span class="opt-icon">🦇</span>Tim Burton</div>
+<div class="option-card" onclick="selectOption('director',this,'Hayao Miyazaki style')" data-value="Hayao Miyazaki style"><span class="opt-icon">🌸</span>H. Miyazaki</div>
+<div class="option-card" onclick="selectOption('director',this,'David Fincher style, dark, precise')" data-value="David Fincher style"><span class="opt-icon">🔍</span>D. Fincher</div>
+</div>
+</div>
+</div>
+
+<!-- GENERATE -->
+<div class="generate-section">
+<button class="generate-btn" onclick="generatePrompt()">
+<span class="btn-shine"></span>
+<span data-i18n="generate">🎬 GERAR PROMPT DE VÍDEO</span>
+</button>
+</div>
+
+<!-- OUTPUT -->
+<div class="prompt-output" id="promptOutput">
+<div class="prompt-header">
+<h3 data-i18n="promptResult">📋 PROMPT GERADO</h3>
+<div class="prompt-actions">
+<button class="prompt-action-btn" onclick="copyPrompt()" id="copyBtn">📋 <span data-i18n="copy">Copiar</span></button>
+<button class="prompt-action-btn" onclick="resetAll()">🔄 <span data-i18n="reset">Resetar</span></button>
+</div>
+</div>
+<div class="prompt-body">
+<div class="prompt-text" id="promptText"></div>
+</div>
+<div class="prompt-meta">
+<span class="prompt-lang-badge pt" id="langBadge">PT-BR</span>
+<span data-i18n="promptMeta">Prompt de vídeo gerado pelo App do Velho Brum</span>
+</div>
+</div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+<span class="bottom-bar-label" data-i18n="promptLangLabel">LINGUAGEM DO PROMPT:</span>
+<div class="prompt-lang-toggle">
+<button class="prompt-lang-btn active" onclick="setPromptLang('pt')" id="promptLangPt">
+<img src="imagem2.png" alt="BR">
+<span data-i18n="promptLangPt">Português</span>
+</button>
+<button class="prompt-lang-btn" onclick="setPromptLang('en')" id="promptLangEn">
+<img src="imagem3.png" alt="US">
+<span data-i18n="promptLangEn">English</span>
+</button>
+</div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal">
+<div class="modal">
+<div class="modal-header">
+<h2 data-i18n="helpTitle">❓ Como Usar</h2>
+<button class="modal-close" onclick="toggleHelp()">✕</button>
+</div>
+<div class="modal-body">
+<div class="help-step">
+<div class="help-num">1</div>
+<div class="help-content">
+<h4 data-i18n="step1Title">Escolha o idioma do App</h4>
+<p data-i18n="step1Text">No topo da tela, clique em 🇧🇷 PT ou 🇸 EN para mudar o idioma de todo o aplicativo.</p>
+</div>
+</div>
+<div class="help-step">
+<div class="help-num">2</div>
+<div class="help-content">
+<h4 data-i18n="step2Title">Preencha as opções</h4>
+<p data-i18n="step2Text">Descreva seu vídeo nas caixas de texto e selecione as opções (estilo, câmera, iluminação, etc.). Não precisa preencher tudo!</p>
+</div>
+</div>
+<div class="help-step">
+<div class="help-num">3</div>
+<div class="help-content">
+<h4 data-i18n="step3Title">Gere o Prompt</h4>
+<p data-i18n="step3Text">Clique no botão "Gerar Prompt de Vídeo". O app vai criar um prompt ultra detalhado para você.</p>
+</div>
+</div>
+<div class="help-step">
+<div class="help-num">4</div>
+<div class="help-content">
+<h4 data-i18n="step4Title">Escolha o idioma do Prompt</h4>
+<p data-i18n="step4Text">No botão inferior, escolha se quer o prompt em 🇧🇷 Português ou 🇺🇸 Inglês. Clique para trocar!</p>
+</div>
+</div>
+<div class="help-step">
+<div class="help-num">5</div>
+<div class="help-content">
+<h4 data-i18n="step5Title">Copie e use!</h4>
+<p data-i18n="step5Text">Clique em "Copiar" e cole o prompt no seu gerador de vídeo favorito (Runway, Pika, Sora, etc.).</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// ===== STATE =====
+let appLang = 'pt';
+let promptLang = 'pt';
+let selections = {};
+let currentPromptText = '';
+
+// ===== TRANSLATIONS =====
+const i18n = {
+pt: {
+theme:'TEMA PRINCIPAL',themeLabel:'Descreva o tema central do seu vídeo',
+themePlaceholder:'Ex: Uma mulher caminhando por uma floresta encantada ao amanhecer...',
+style:'ESTILO VISUAL',styleLabel:'Selecione o estilo visual',
+optCinema:'Cinematográfico',optReal:'Realista',opt3d:'3D Render',
+optWater:'Aquarela',optFantasy:'Fantasia',optDoc:'Documentário',
+camera:'CÂMERA',angleLabel:'Ângulo de Câmera',
+optLow:'Ângulo Baixo',movementLabel:'Movimento de Câmera',
+optStatic:'Estático',lensLabel:'Tipo de Lente',
+optLensNone:'Nenhuma (Automático)',depthLabel:'Profundidade de Campo',
+optDepthNone:'Nenhuma (Automático)',
+lighting:'ILUMINAÇÃO',lightLabel:'Tipo de Iluminação',
+atmosphere:'ATMOSFERA E MOOD',moodLabel:'Selecione o clima atmosférico',
+moodFog:'Neblina',moodRain:'Chuva',moodSnow:'Neve',moodWind:'Vento',
+moodDust:'Poeira',moodSmoke:'Fumaça',moodSparkles:'Brilhos',
+moodParticles:'Partículas',moodMist:'Névoa',moodLeaves:'Folhas',
+emotionLabel:'Emoção / Sentimento',
+setting:'CENÁRIO',locationLabel:'Tipo de Localização',
+timeLabel:'Hora do Dia',optTimeNone:'Nenhuma (Automático)',
+weatherLabel:'Clima / Tempo',optWeatherNone:'Nenhum (Automático)',
+characters:'PERSONAGENS / SUJEITOS',subjectLabel:'Descrição do Sujeito Principal',
+subjectPlaceholder:'Ex: Uma jovem mulher com cabelos ruivos longos, vestindo um casaco vermelho...',
+actionLabel:'Ação / Movimento do Sujeito',
+actionPlaceholder:'Ex: Caminhando lentamente, virando o rosto, olhando para o horizonte...',
+detailsLabel:'Detalhes Adicionais do Sujeito',
+detailHair:'Detalhes do Cabelo',detailFace:'Expressão Facial',
+detailEyes:'Olhos Detalhados',detailClothes:'Roupas Detalhadas',
+detailProps:'Objetos/Props',detailAnimals:'Animais',
+detailCrowd:'Multidão',detailSilhouette:'Silhueta',
+composition:'COMPOSIÇÃO E COR',colorPaletteLabel:'Paleta de Cores',
+optWarm:'Quente',optCool:'Frio',optMono:'Mono',optVibrant:'Vibrante',
+optPastel:'Pastel',optContrast:'Alto Contraste',optMuted:'Dessaturado',
+aspectLabel:'Proporção (Aspect Ratio)',
+duration:'DURAÇÃO E FRAME RATE',durLabel:'Duração (segundos)',
+speedLabel:'Velocidade',optNormal:'Normal',optSlow:'Slow Motion',
+optSuperSlow:'Super Slow Motion',optTimeLapse:'Timelapse',optHyper:'Hyperlapse',
+quality:'QUALIDADE E DETALHES TÉCNICOS',qualityLabel:'Nível de Qualidade',
+optDetailed:'Ultra Detalhado',engineLabel:'Motor de Renderização',
+optEngineNone:'Nenhum (Automático)',negativeLabel:'Prompt Negativo (o que evitar)',
+negativePlaceholder:'Ex: blur, low quality, distorted, ugly, bad anatomy...',
+effects:'EFEITOS ESPECIAIS',effectsLabel:'Selecione os efeitos desejados',
+effLens:'Lens Flare',effGrain:'Film Grain',effVignette:'Vinheta',
+effChromatic:'Aberração Cromática',effGlow:'Brilho/Glow',effBloom:'Bloom',
+effMotionBlur:'Motion Blur',effDepthBlur:'Desfoque de Profundidade',
+effGlitch:'Glitch',effRetro:'Retro/Vintage',effHDR:'HDR',effLightRays:'Raios de Luz',
+references:'REFERÊNCIAS ARTÍSTICAS',directorLabel:'Estilo de Diretor / Referência Visual',
+generate:'🎬 GERAR PROMPT DE VÍDEO',promptResult:'📋 PROMPT GERADO',
+copy:'Copiar',reset:'Resetar',promptMeta:'Prompt de vídeo gerado pelo App do Velho Brum',
+promptLangLabel:'LINGUAGEM DO PROMPT:',promptLangPt:'Português',promptLangEn:'English',
+helpTitle:'❓ Como Usar',
+step1Title:'Escolha o idioma do App',
+step1Text:'No topo da tela, clique em 🇧🇷 PT ou 🇺🇸 EN para mudar o idioma de todo o aplicativo.',
+step2Title:'Preencha as opções',
+step2Text:'Descreva seu vídeo nas caixas de texto e selecione as opções (estilo, câmera, iluminação, etc.). Não precisa preencher tudo!',
+step3Title:'Gere o Prompt',
+step3Text:'Clique no botão "Gerar Prompt de Vídeo". O app vai criar um prompt ultra detalhado para você.',
+step4Title:'Escolha o idioma do Prompt',
+step4Text:'No botão inferior, escolha se quer o prompt em 🇧🇷 Português ou 🇺🇸 Inglês. Clique para trocar!',
+step5Title:'Copie e use!',
+step5Text:'Clique em "Copiar" e cole o prompt no seu gerador de vídeo favorito (Runway, Pika, Sora, etc.).',
+copied:'Copiado!',
+},
+en: {
+theme:'MAIN THEME',themeLabel:'Describe the central theme of your video',
+themePlaceholder:'Ex: A woman walking through an enchanted forest at dawn...',
+style:'VISUAL STYLE',styleLabel:'Select the visual style',
+optCinema:'Cinematic',optReal:'Realistic',opt3d:'3D Render',
+optWater:'Watercolor',optFantasy:'Fantasy',optDoc:'Documentary',
+camera:'CAMERA',angleLabel:'Camera Angle',
+optLow:'Low Angle',movementLabel:'Camera Movement',
+optStatic:'Static',lensLabel:'Lens Type',
+optLensNone:'None (Auto)',depthLabel:'Depth of Field',
+optDepthNone:'None (Auto)',
+lighting:'LIGHTING',lightLabel:'Lighting Type',
+atmosphere:'ATMOSPHERE & MOOD',moodLabel:'Select the atmospheric mood',
+moodFog:'Fog',moodRain:'Rain',moodSnow:'Snow',moodWind:'Wind',
+moodDust:'Dust',moodSmoke:'Smoke',moodSparkles:'Sparkles',
+moodParticles:'Particles',moodMist:'Mist',moodLeaves:'Leaves',
+emotionLabel:'Emotion / Feeling',
+setting:'SETTING',locationLabel:'Location Type',
+timeLabel:'Time of Day',optTimeNone:'None (Auto)',
+weatherLabel:'Weather',optWeatherNone:'None (Auto)',
+characters:'CHARACTERS / SUBJECTS',subjectLabel:'Main Subject Description',
+subjectPlaceholder:'Ex: A young woman with long red hair, wearing a red coat, with a determined expression...',
+actionLabel:'Subject Action / Movement',
+actionPlaceholder:'Ex: Walking slowly, turning her face, looking at the horizon...',
+detailsLabel:'Additional Subject Details',
+detailHair:'Hair Details',detailFace:'Facial Expression',
+detailEyes:'Detailed Eyes',detailClothes:'Detailed Clothing',
+detailProps:'Objects/Props',detailAnimals:'Animals',
+detailCrowd:'Crowd',detailSilhouette:'Silhouette',
+composition:'COMPOSITION & COLOR',colorPaletteLabel:'Color Palette',
+optWarm:'Warm',optCool:'Cool',optMono:'Monochrome',optVibrant:'Vibrant',
+optPastel:'Pastel',optContrast:'High Contrast',optMuted:'Desaturated',
+aspectLabel:'Aspect Ratio',
+duration:'DURATION & FRAME RATE',durLabel:'Duration (seconds)',
+speedLabel:'Speed',optNormal:'Normal',optSlow:'Slow Motion',
+optSuperSlow:'Super Slow Motion',optTimeLapse:'Timelapse',optHyper:'Hyperlapse',
+quality:'QUALITY & TECHNICAL DETAILS',qualityLabel:'Quality Level',
+optDetailed:'Ultra Detailed',engineLabel:'Render Engine',
+optEngineNone:'None (Auto)',negativeLabel:'Negative Prompt (what to avoid)',
+negativePlaceholder:'Ex: blur, low quality, distorted, ugly, bad anatomy...',
+effects:'SPECIAL EFFECTS',effectsLabel:'Select desired effects',
+effLens:'Lens Flare',effGrain:'Film Grain',effVignette:'Vignette',
+effChromatic:'Chromatic Aberration',effGlow:'Glow',effBloom:'Bloom',
+effMotionBlur:'Motion Blur',effDepthBlur:'Depth Blur',
+effGlitch:'Glitch',effRetro:'Retro/Vintage',effHDR:'HDR',effLightRays:'Light Rays',
+references:'ARTISTIC REFERENCES',directorLabel:'Director Style / Visual Reference',
+generate:'🎬 GENERATE VIDEO PROMPT',promptResult:'📋 GENERATED PROMPT',
+copy:'Copy',reset:'Reset',promptMeta:'Video prompt generated by App do Velho Brum',
+promptLangLabel:'PROMPT LANGUAGE:',promptLangPt:'Portuguese',promptLangEn:'English',
+helpTitle:'❓ How to Use',
+step1Title:'Choose App Language',
+step1Text:'At the top of the screen, click 🇧🇷 PT or 🇺🇸 EN to change the language of the entire app.',
+step2Title:'Fill in the options',
+step2Text:'Describe your video in the text boxes and select options (style, camera, lighting, etc.). You don\'t need to fill everything!',
+step3Title:'Generate the Prompt',
+step3Text:'Click the "Generate Video Prompt" button. The app will create an ultra-detailed prompt for you.',
+step4Title:'Choose Prompt Language',
+step4Text:'At the bottom button, choose if you want the prompt in 🇧🇷 Portuguese or 🇺🇸 English. Click to switch!',
+step5Title:'Copy and use!',
+step5Text:'Click "Copy" and paste the prompt into your favorite video generator (Runway, Pika, Sora, etc.).',
+copied:'Copied!',
+}
+};
+
+// ===== SPLASH SCREEN =====
+setTimeout(()=>{
+document.getElementById('splash').classList.add('hide');
+setTimeout(()=>{
+document.getElementById('splash').style.display='none';
+document.getElementById('app').classList.add('show');
+},800);
+},3000);
+
+// ===== LANGUAGE =====
+function setAppLang(lang){
+appLang=lang;
+document.getElementById('langBtnPt').classList.toggle('active',lang==='pt');
+document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+document.documentElement.lang=lang==='pt'?'pt-BR':'en';
+applyTranslations();
+}
+
+function setPromptLang(lang){
+promptLang=lang;
+document.getElementById('promptLangPt').classList.toggle('active',lang==='pt');
+document.getElementById('promptLangEn').classList.toggle('active',lang==='en');
+const badge=document.getElementById('langBadge');
+badge.textContent=lang==='pt'?'PT-BR':'EN';
+badge.className='prompt-lang-badge '+lang;
+}
+
+function applyTranslations(){
+const t=i18n[appLang];
+document.querySelectorAll('[data-i18n]').forEach(el=>{
+const key=el.getAttribute('data-i18n');
+if(t[key])el.textContent=t[key];
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+const key=el.getAttribute('data-i18n-placeholder');
+if(t[key])el.placeholder=t[key];
+});
+}
+
+// ===== UI INTERACTIONS =====
+function selectOption(category,el,value){
+const grid=el.parentElement;
+grid.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+el.classList.add('selected');
+selections[category]=value;
+}
+
+function toggleCheck(el){
+el.classList.toggle('checked');
+}
+
+function updateSlider(type){
+const slider=document.getElementById('durationSlider');
+const val=document.getElementById('durationValue');
+val.textContent=slider.value+'s';
+}
+
+// ===== HELP MODAL =====
+function toggleHelp(){
+document.getElementById('helpModal').classList.toggle('show');
+}
+
+// ===== PROMPT GENERATION =====
+function getCheckedValues(groupId){
+const items=document.getElementById(groupId).querySelectorAll('.checkbox-item.checked');
+return Array.from(items).map(i=>i.textContent.trim());
+}
+
+function generatePrompt(){
+const theme=document.getElementById('themeInput').value.trim();
+const subject=document.getElementById('subjectInput').value.trim();
+const action=document.getElementById('actionInput').value.trim();
+const negative=document.getElementById('negativeInput').value.trim();
+
+const lens=document.getElementById('lensSelect').value;
+const depth=document.getElementById('depthSelect').value;
+const timeOfDay=document.getElementById('timeSelect').value;
+const weather=document.getElementById('weatherSelect').value;
+const aspect=document.getElementById('aspectSelect').value;
+const duration=document.getElementById('durationSlider').value;
+const fps=document.getElementById('fpsSelect').value;
+const speed=document.getElementById('speedSelect').value;
+const engine=document.getElementById('engineSelect').value;
+
+const style=selections.style||'';
+const angle=selections.angle||'';
+const camMove=selections.camMove||'';
+const light=selections.light||'';
+const emotion=selections.emotion||'';
+const location=selections.location||'';
+const color=selections.color||'';
+const quality=selections.quality||'';
+const director=selections.director||'';
+
+const moods=getCheckedValues('moodGroup');
+const subjectDetails=getCheckedValues('subjectDetails');
+const effects=getCheckedValues('effectsGroup');
+
+let finalPrompt='';
+
+if(promptLang==='pt'){
+let p='';
+if(style)p+=`Estilo visual: ${style}\n`;
+if(director)p+=`Referência artística: ${director}\n`;
+if(theme)p+=`Tema: ${theme}\n`;
+if(subject)p+=`Sujeito principal: ${subject}\n`;
+if(action)p+=`Ação: ${action}\n`;
+if(location)p+=`Cenário: ${location}\n`;
+if(timeOfDay)p+=`Hora: ${timeOfDay}\n`;
+if(weather)p+=`Clima: ${weather}\n`;
+if(light)p+=`Iluminação: ${light}\n`;
+if(angle)p+=`Ângulo de câmera: ${angle}\n`;
+if(camMove)p+=`Movimento de câmera: ${camMove}\n`;
+if(lens)p+=`Lente: ${lens}\n`;
+if(depth)p+=`Profundidade de campo: ${depth}\n`;
+if(color)p+=`Paleta de cores: ${color}\n`;
+if(emotion)p+=`Atmosfera emocional: ${emotion}\n`;
+if(moods.length)p+=`Elementos atmosféricos: ${moods.join(', ')}\n`;
+if(subjectDetails.length)p+=`Detalhes: ${subjectDetails.join(', ')}\n`;
+if(effects.length)p+=`Efeitos: ${effects.join(', ')}\n`;
+if(engine)p+=`Renderização: ${engine}\n`;
+if(quality)p+=`Qualidade: ${quality}\n`;
+p+=`Proporção: ${aspect}\n`;
+p+=`Duração: ${duration} segundos\n`;
+p+=`Frame rate: ${fps}\n`;
+p+=`Velocidade: ${speed}\n`;
+if(negative)p+=`Evitar: ${negative}\n`;
+
+p+='\n--- PROMPT FINAL ---\n\n';
+p+=`Crie um vídeo ${style ? style+' de' : ''} mostrando ${theme||subject||'a cena descrita'}. ${subject?'O sujeito principal é: '+subject+'.':''} ${action?'A ação é: '+action+'.':''} ${location?'Ambientado em '+location+'.':''} ${timeOfDay?'Com iluminação de '+timeOfDay+'.':''} ${weather?weather+'.':''} ${light?'Iluminação '+light+'.':''} ${angle?'Filmado em '+angle+'.':''} ${camMove?'Com movimento de câmera '+camMove+'.':''} ${lens?'Usando lente '+lens+'.':''} ${depth?depth+'.':''} ${color?'Paleta de cores '+color+'.':''} ${emotion?'Transmitindo uma sensação '+emotion+'.':''} ${moods.length?'Com '+moods.join(', ')+'.':''} ${effects.length?'Incluindo efeitos de '+effects.join(', ')+'.':''} ${engine?'Renderizado no estilo '+engine+'.':''} ${quality?'Com qualidade '+quality+'.':''} Proporção ${aspect}, ${duration}s, ${fps}, ${speed}.`;
+
+finalPrompt=p;
+
+}else{
+let p='';
+if(style)p+=`Visual style: ${style}\n`;
+if(director)p+=`Artistic reference: ${director}\n`;
+if(theme)p+=`Theme: ${theme}\n`;
+if(subject)p+=`Main subject: ${subject}\n`;
+if(action)p+=`Action: ${action}\n`;
+if(location)p+=`Setting: ${location}\n`;
+if(timeOfDay)p+=`Time: ${timeOfDay}\n`;
+if(weather)p+=`Weather: ${weather}\n`;
+if(light)p+=`Lighting: ${light}\n`;
+if(angle)p+=`Camera angle: ${angle}\n`;
+if(camMove)p+=`Camera movement: ${camMove}\n`;
+if(lens)p+=`Lens: ${lens}\n`;
+if(depth)p+=`Depth of field: ${depth}\n`;
+if(color)p+=`Color palette: ${color}\n`;
+if(emotion)p+=`Emotional atmosphere: ${emotion}\n`;
+if(moods.length)p+=`Atmospheric elements: ${moods.join(', ')}\n`;
+if(subjectDetails.length)p+=`Details: ${subjectDetails.join(', ')}\n`;
+if(effects.length)p+=`Effects: ${effects.join(', ')}\n`;
+if(engine)p+=`Render engine: ${engine}\n`;
+if(quality)p+=`Quality: ${quality}\n`;
+p+=`Aspect ratio: ${aspect}\n`;
+p+=`Duration: ${duration} seconds\n`;
+p+=`Frame rate: ${fps}\n`;
+p+=`Speed: ${speed}\n`;
+if(negative)p+=`Negative prompt: ${negative}\n`;
+
+p+='\n--- FINAL PROMPT ---\n\n';
+
+let promptText='Create a ';
+if(style)promptText+=style+' ';
+promptText+='video ';
+if(director)promptText+=`in the style of ${director} `;
+if(theme)promptText+=`showing ${theme}`;
+else if(subject)promptText+=`featuring ${subject}`;
+else promptText+=`the described scene`;
+
+if(subject)promptText+=`. The main subject is: ${subject}`;
+if(action)promptText+=`. Action: ${action}`;
+if(location)promptText+=`. Set in ${location}`;
+if(timeOfDay)promptText+=`, ${timeOfDay}`;
+if(weather)promptText+=`, ${weather}`;
+if(light)promptText+=`. ${light} lighting`;
+if(angle)promptText+=`. Shot from a ${angle} perspective`;
+if(camMove)promptText+=` with ${camMove}`;
+if(lens)promptText+=`. Filmed with ${lens}`;
+if(depth)promptText+=`, ${depth}`;
+if(color)promptText+=`. ${color} color palette`;
+if(emotion)promptText+=`. Evoking a ${emotion} feeling`;
+if(moods.length)promptText+=`. Featuring ${moods.join(', ')}`;
+if(effects.length)promptText+=`. With ${effects.join(', ')} effects`;
+if(engine)promptText+=`. ${engine} style rendering`;
+if(quality)promptText+=`. ${quality} quality`;
+
+promptText+=`. Aspect ratio ${aspect}, ${duration} seconds duration, ${fps}, ${speed}.`;
+
+if(negative)promptText+=`\n\nNegative prompt: ${negative}`;
+
+p+=promptText;
+
+finalPrompt=p;
+}
+
+currentPromptText=finalPrompt;
+document.getElementById('promptText').textContent=finalPrompt;
+const output=document.getElementById('promptOutput');
+output.classList.add('show');
+output.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function copyPrompt(){
+if(!currentPromptText){return;}
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(currentPromptText).then(()=>{
+showCopiedFeedback();
+}).catch(()=>{
+fallbackCopy();
+});
+}else{
+fallbackCopy();
+}
+}
+
+function fallbackCopy(){
+const ta=document.createElement('textarea');
+ta.value=currentPromptText;
+ta.style.position='fixed';
+ta.style.left='-9999px';
+ta.style.top='-9999px';
+document.body.appendChild(ta);
+ta.focus();
+ta.select();
+ta.setSelectionRange(0,ta.value.length);
+try{
+document.execCommand('copy');
+showCopiedFeedback();
+}catch(e){
+alert('Erro ao copiar. Selecione o texto manualmente.');
+}
+document.body.removeChild(ta);
+}
+
+function showCopiedFeedback(){
+const btn=document.getElementById('copyBtn');
+const t=i18n[appLang];
+btn.innerHTML='✅ '+t.copied;
+btn.classList.add('copied');
+setTimeout(()=>{
+btn.innerHTML='📋 <span data-i18n="copy">'+(appLang==='pt'?'Copiar':'Copy')+'</span>';
+btn.classList.remove('copied');
+},2000);
+}
+
+function resetAll(){
+document.querySelectorAll('.form-textarea,.form-input').forEach(el=>el.value='');
+document.querySelectorAll('.option-card').forEach(el=>el.classList.remove('selected'));
+document.querySelectorAll('.checkbox-item').forEach(el=>el.classList.remove('checked'));
+document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+document.getElementById('durationSlider').value=5;
+document.getElementById('durationValue').textContent='5s';
+document.getElementById('promptOutput').classList.remove('show');
+currentPromptText='';
+selections={};
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('helpModal').addEventListener('click',function(e){
+if(e.target===this)toggleHelp();
+});
+</script>
+</body>
+</html>
+
